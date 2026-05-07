@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AgentRole {
+  CEO
+  CFO
+  CTO
+  CMO
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+  TOOL
+}
+
+enum TaskStatus {
+  QUEUED
+  RUNNING
+  BLOCKED
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id            String         @id @default(uuid()) @db.Uuid
+  supabaseId    String         @unique @map("supabase_id")
+  email         String         @unique
+  fullName      String?        @map("full_name")
+  avatarUrl     String?        @map("avatar_url")
+  companyName   String?        @map("company_name")
+  role          String?        @default("Executive")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  messages      AiMessage[]
+  notifications Notification[]
+  campaigns     Campaign[]
+  tasks         Task[]
+  activityLogs  ActivityLog[]
+
+  @@map("users")
+}
+
+model AiAgent {
+  id             String        @id @default(uuid()) @db.Uuid
+  role           AgentRole     @unique
+  name           String
+  mission        String
+  systemPrompt   String        @map("system_prompt")
+  memorySummary  String?       @map("memory_summary")
+  context        Json          @default("{}")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  messages       AiMessage[]
+  tasks          Task[]
+  activityLogs   ActivityLog[]
+
+  @@map("ai_agents")
+}
+
+model AiMessage {
+  id          String      @id @default(uuid()) @db.Uuid
+  userId      String?     @map("user_id") @db.Uuid
+  agentId     String      @map("agent_id") @db.Uuid
+  role        MessageRole
+  content     String
+  metadata    Json        @default("{}")
+  embedding   Json?
+  createdAt   DateTime    @default(now()) @map("created_at")
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent       AiAgent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt])
+  @@map("ai_messages")
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  title     String
+  body      String
+  type      String
+  readAt    DateTime? @map("read_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model Campaign {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String?      @map("user_id") @db.Uuid
+  name        String
+  objective   String
+  status      String       @default("draft")
+  budget      Decimal?     @db.Decimal(12, 2)
+  channels    String[]
+  startsAt    DateTime?    @map("starts_at")
+  endsAt      DateTime?    @map("ends_at")
+  metrics     Json         @default("{}")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  socialPosts SocialPost[]
+
+  @@map("campaigns")
+}
+
+model RevenueData {
+  id               String   @id @default(uuid()) @db.Uuid
+  source           String   @default("stripe")
+  period           DateTime
+  mrr              Decimal  @db.Decimal(14, 2)
+  arr              Decimal  @db.Decimal(14, 2)
+  churnRate        Decimal  @map("churn_rate") @db.Decimal(5, 2)
+  subscriptions    Int
+  expansionRevenue Decimal? @map("expansion_revenue") @db.Decimal(14, 2)
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([period])
+  @@map("revenue_data")
+}
+
+model GithubActivity {
+  id           String   @id @default(uuid()) @db.Uuid
+  repository   String
+  eventType    String   @map("event_type")
+  actor        String?
+  title        String
+  url          String?
+  sha          String?
+  metadata     Json     @default("{}")
+  occurredAt   DateTime @map("occurred_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([repository, occurredAt])
+  @@map("github_activity")
+}
+
+model SocialPost {
+  id          String    @id @default(uuid()) @db.Uuid
+  campaignId  String?   @map("campaign_id") @db.Uuid
+  platform    String
+  caption     String
+  hashtags    String[]
+  mediaUrl    String?   @map("media_url")
+  status      String    @default("scheduled")
+  scheduledAt DateTime? @map("scheduled_at")
+  publishedAt DateTime? @map("published_at")
+  metrics     Json      @default("{}")
+  campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([platform, scheduledAt])
+  @@map("social_posts")
+}
+
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String?    @map("user_id") @db.Uuid
+  agentId     String?    @map("agent_id") @db.Uuid
+  title       String
+  description String?
+  status      TaskStatus @default(QUEUED)
+  priority    Priority   @default(MEDIUM)
+  dueAt       DateTime?  @map("due_at")
+  metadata    Json       @default("{}")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  user        User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent       AiAgent?   @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([status, priority])
+  @@map("tasks")
+}
+
+model Analytics {
+  id        String   @id @default(uuid()) @db.Uuid
+  scope     String
+  metric    String
+  value     Decimal  @db.Decimal(18, 4)
+  dimension Json     @default("{}")
+  period    DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([scope, metric, period])
+  @@map("analytics")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  agentId   String?  @map("agent_id") @db.Uuid
+  event     String
+  severity  String   @default("info")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent     AiAgent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([severity, createdAt])
+  @@map("activity_logs")
+}
