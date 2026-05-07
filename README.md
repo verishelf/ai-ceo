@@ -90,6 +90,8 @@ datasource db {
 }
 ```
 
+The build runs `scripts/verify-prisma-schema.mjs` before Prisma. Fresh Vercel deploys should print the commit SHA and datasource block. If Vercel logs still show `url = env("DATABASE_URL")`, the deployment is using an older commit, often because the failed deployment was redeployed from Vercel instead of triggering a new deployment from the latest pushed branch.
+
 ## Architecture
 
 ```text

@@ -5,6 +5,7 @@
   "description": "NexusOS AI Executive Operating System dashboard.",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/verify-prisma-schema.mjs",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
