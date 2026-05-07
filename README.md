@@ -79,6 +79,7 @@ npm run db:seed
 2. Set all environment variables in Vercel.
 3. Run `npm run db:push` against the production `DATABASE_URL`.
 4. Deploy with Vercel. The build command is `npm run build`.
+5. Leave Vercel's Output Directory blank for the Next.js framework preset. Do not set it to `public`; that makes the deployment behave like a static file site and can return 404s for App Router pages.
 
 ### Prisma 7 on Vercel
 
