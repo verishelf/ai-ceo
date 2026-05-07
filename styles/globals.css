@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: 231 52% 4%;
+  --foreground: 210 40% 98%;
+  --card: 228 35% 8%;
+  --card-foreground: 210 40% 98%;
+  --popover: 228 35% 8%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 187 100% 50%;
+  --primary-foreground: 226 65% 7%;
+  --secondary: 250 72% 62%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 226 25% 15%;
+  --muted-foreground: 218 18% 68%;
+  --accent: 316 100% 58%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 210 40% 98% / 0.12;
+  --input: 210 40% 98% / 0.14;
+  --ring: 187 100% 50%;
+  --radius: 1.25rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  min-height: 100%;
+  background: #050713;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(0, 229, 255, 0.16), transparent 28rem),
+    radial-gradient(circle at 84% 12%, rgba(139, 92, 246, 0.22), transparent 26rem),
+    radial-gradient(circle at 52% 80%, rgba(255, 43, 214, 0.12), transparent 24rem),
+    #050713;
+  color: hsl(var(--foreground));
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
+}
+
+::selection {
+  background: rgba(0, 229, 255, 0.28);
+  color: white;
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(24px);
+}
+
+.nexus-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 54px 54px;
+}
+
+.animated-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(from 180deg, rgba(0, 229, 255, 0.8), rgba(139, 92, 246, 0.25), rgba(255, 43, 214, 0.65), rgba(0, 229, 255, 0.8));
+  filter: blur(12px);
+  opacity: 0.42;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #ffffff, #83f4ff 45%, #f7a6ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.scrollbar-thin {
+  scrollbar-color: rgba(0, 229, 255, 0.36) transparent;
+  scrollbar-width: thin;
+}
