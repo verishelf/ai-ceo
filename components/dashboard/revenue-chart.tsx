@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { revenueSeries } from "@/lib/constants";
@@ -7,6 +8,12 @@ import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function RevenueChart() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -14,7 +21,8 @@ export function RevenueChart() {
         <CardDescription>MRR, expenses, and AI forecast from the CFO agent.</CardDescription>
       </CardHeader>
       <CardContent className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+        {mounted ? (
+          <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={revenueSeries}>
             <defs>
               <linearGradient id="revenue" x1="0" x2="0" y1="0" y2="1">
@@ -37,6 +45,9 @@ export function RevenueChart() {
             <Area type="monotone" dataKey="forecast" stroke="#8b5cf6" fill="url(#forecast)" strokeWidth={2} strokeDasharray="6 6" />
           </AreaChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="h-full rounded-2xl bg-white/[0.04]" />
+        )}
       </CardContent>
     </Card>
   );

@@ -1,6 +1,8 @@
 import { PrismaClient, AgentRole } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg(process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/nexusos");
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const agents = [

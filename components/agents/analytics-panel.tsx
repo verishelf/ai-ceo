@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { RadialBar, RadialBarChart, ResponsiveContainer } from "recharts";
 
 import type { AgentId, KPI } from "@/types";
@@ -29,7 +30,12 @@ const kpis: Record<AgentId, KPI[]> = {
 };
 
 export function AnalyticsPanel({ agentId }: { agentId: AgentId }) {
+  const [mounted, setMounted] = useState(false);
   const health = agentId === "ceo" ? 91 : agentId === "cfo" ? 86 : agentId === "cto" ? 89 : 92;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <Card>
@@ -40,11 +46,15 @@ export function AnalyticsPanel({ agentId }: { agentId: AgentId }) {
       <CardContent>
         <div className="grid gap-4 md:grid-cols-[180px_1fr]">
           <div className="h-44">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadialBarChart innerRadius="68%" outerRadius="100%" data={[{ name: "health", value: health, fill: "#00e5ff" }]} startAngle={90} endAngle={-270}>
-                <RadialBar background dataKey="value" cornerRadius={18} />
-              </RadialBarChart>
-            </ResponsiveContainer>
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <RadialBarChart innerRadius="68%" outerRadius="100%" data={[{ name: "health", value: health, fill: "#00e5ff" }]} startAngle={90} endAngle={-270}>
+                  <RadialBar background dataKey="value" cornerRadius={18} />
+                </RadialBarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full rounded-full bg-white/[0.04]" />
+            )}
             <p className="-mt-24 text-center font-[var(--font-display)] text-4xl font-bold text-white">{health}</p>
             <p className="text-center text-xs text-slate-500">health score</p>
           </div>

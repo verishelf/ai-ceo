@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { AuthForm } from "@/components/auth/auth-form";
 
@@ -6,7 +7,9 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12 nexus-grid">
       <div className="w-full max-w-md">
-        <AuthForm mode="login" />
+        <Suspense fallback={<div className="glass-panel rounded-3xl p-8 text-sm text-slate-300">Loading secure access...</div>}>
+          <AuthForm mode="login" />
+        </Suspense>
         <p className="mt-6 text-center text-sm text-slate-400">
           New operator?{" "}
           <Link className="text-cyan-200 hover:text-cyan-100" href="/signup">
