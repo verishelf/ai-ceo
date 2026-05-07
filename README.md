@@ -80,6 +80,16 @@ npm run db:seed
 3. Run `npm run db:push` against the production `DATABASE_URL`.
 4. Deploy with Vercel. The build command is `npm run build`.
 
+### Prisma 7 on Vercel
+
+Prisma 7 no longer supports `url = env("DATABASE_URL")` inside `schema.prisma`. NexusOS stores the connection URL in `prisma.config.ts` and the Prisma client uses `@prisma/adapter-pg`. If Vercel reports `datasource property url is no longer supported`, redeploy the latest commit and confirm the deployed `database/schema.prisma` datasource only contains:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+}
+```
+
 ## Architecture
 
 ```text
